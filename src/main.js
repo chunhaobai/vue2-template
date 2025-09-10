@@ -29,7 +29,6 @@ function loadConfig() {
       // 挂载到 Vue 原型
       Vue.prototype.$config = config
       Vue.prototype.$token = token
-      Vue.prototype.$userInfo = userInfo
 
       resolve()
     }
