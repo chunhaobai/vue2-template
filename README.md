@@ -14,6 +14,7 @@ git clone  git@github.com:chunhaobai/vue2-template.git my-new-project
 cd my-new-project
 npm install
 npm run serve
+npm run build
 
 
 ## request接口使用方式
