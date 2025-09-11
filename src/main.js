@@ -3,8 +3,31 @@ import App from './App.vue'
 import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-
+import { Decimal } from 'decimal.js';
+Vue.prototype.Decimal = Decimal;
 Vue.use(ElementUI)
+
+// ✅ Vue 内部错误（生命周期、methods 等）
+Vue.config.errorHandler = (err, vm, info) => {
+  console.error('Vue 错误>>>>>>', err)
+  console.error('出错组件>>>>>>', vm)
+  console.error('错误信息>>>>>>', info)
+
+  // TODO: 这里可以调用你的接口，把错误上报到服务器
+  // reportError({ type: 'vue', err, info })
+}
+
+// ✅ 原生 JS 错误（语法错误、运行时报错）
+window.onerror = (msg, url, line, col, error) => {
+  console.error('JS 错误>>>>>>', msg, url, line, col, error)
+  // reportError({ type: 'js', msg, url, line, col, error })
+}
+
+// ✅ Promise 错误（未 catch 的 reject）
+window.addEventListener('unhandledrejection', event => {
+  console.error('Promise 错误>>>>>>', event.reason)
+  // reportError({ type: 'promise', reason: event.reason })
+})
 
 // 加载配置函数
 function loadConfig() {
