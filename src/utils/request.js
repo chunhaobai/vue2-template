@@ -109,6 +109,18 @@ service.interceptors.response.use(
       showError(error);
     }else if (
       // 网络错误
+      error.message.indexOf("code 405") !== -1
+    ) {
+      const showError = Throttle((error) => {
+        MessageBox.alert('请求失败，请联系管理员处理，-1', "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
+    }else if (
+      // 网络错误
       error.message.indexOf("code 403") !== -1
     ) {
       const showError = Throttle((error) => {
@@ -119,7 +131,7 @@ service.interceptors.response.use(
         });
       }, 2000);
       showError(error);
-    }else if (error.message == 'Network Error' || error){
+    }else if (error.message == 'Network Error'){
       const showError = Throttle((error) => {
         MessageBox.alert('网络错误，-1', "提示", {
           confirmButtonText: "确定",

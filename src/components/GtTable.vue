@@ -49,11 +49,13 @@
       </el-table-column>
 
       <template v-for="(item, index) in ColumnData">
+       <!-- 固定一行内容 -->
         <el-table-column
           v-if="!item.children"
           :prop="item.prop"
           :label="item.label"
           :width="item.width"
+          :min-width="item.minWidth"
           :align="item.align ? item.align : 'center'"
           :show-overflow-tooltip="item.tooltip || true"
           :sortable="item.sortable"
@@ -69,7 +71,29 @@
             <span v-else v-html="scope.row[item.prop]"></span>
           </template>
         </el-table-column>
-
+        <!-- 多行内容切换 -->
+        <!-- <el-table-column
+          v-if="!item.children"
+          :prop="item.prop"
+          :label="item.label"
+          :width="item.width"
+          :align="item.align ? item.align : 'center'"
+          :show-overflow-tooltip="false"
+          :sortable="item.sortable"
+          :key="index"
+          :fixed="item.isFixed||false"
+        >
+        <template slot-scope="scope">
+          <slot
+            v-if="item.customColumn"
+            :name="item.prop"
+            v-bind:data="{ row: scope.row, index: scope.$index, item: item }"
+          ></slot>
+          <el-tooltip class="item" effect="dark" :content="scope.row[item.prop]" placement="top">
+            <div class="two-line-ellipsis" v-html="scope.row[item.prop]"></div>
+          </el-tooltip>
+        </template>
+        </el-table-column> -->
         <!-- 添加嵌套表头支持 -->
         <el-table-column
           v-else
@@ -243,6 +267,10 @@ export default {
 
 <style lang="scss" scoped>
 ::v-deep .el-table {
+  //解开自适应父盒子高度
+  // position: absolute;
+  // top: 0;
+  // left: 0;
   .split-row {
     background: #F3FEFF!important;
   }
@@ -253,7 +281,16 @@ export default {
     }
   }
 }
-  
+//解开单元格自动换行
+.two-line-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 显示几行 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
 </style>
 
 
