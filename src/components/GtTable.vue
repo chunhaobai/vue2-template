@@ -89,7 +89,7 @@
             :name="item.prop"
             v-bind:data="{ row: scope.row, index: scope.$index, item: item }"
           ></slot>
-          <el-tooltip class="item" effect="dark" :content="scope.row[item.prop]" placement="top">
+          <el-tooltip v-else class="item" effect="dark" :content="scope.row[item.prop]" placement="top">
             <div class="two-line-ellipsis" v-html="scope.row[item.prop]"></div>
           </el-tooltip>
         </template>
