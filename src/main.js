@@ -62,13 +62,23 @@ function loadConfig() {
   })
 }
 
-function getHashQueryParams() {
+function getHashQueryParams() {//hash
   const hash = window.location.hash || ''
   const queryString = hash.includes('?') ? hash.split('?')[1] : ''
   const params = new URLSearchParams(queryString)
   const result = {}
 
   for (const [key, value] of params.entries()) {
+    result[key] = value
+  }
+
+  return result
+}
+function getHrefQueryParams() { //href
+  const url = new URL(window.location.href)
+  const result = {}
+
+  for (const [key, value] of url.searchParams.entries()) {
     result[key] = value
   }
 

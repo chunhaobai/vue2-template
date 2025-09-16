@@ -35,5 +35,6 @@ module.exports = defineConfig({
         filename: 'static/fonts/[name].[hash:8][ext]',
         publicPath: '../' // 关键：让 CSS 能找到字体文件
       })
+    config.resolve.alias.set('@', path.resolve(__dirname, 'src'))
   }
 })

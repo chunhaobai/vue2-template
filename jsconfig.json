@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]   // 告诉编辑器 @ 就是 src
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
