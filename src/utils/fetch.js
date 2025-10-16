@@ -24,7 +24,7 @@ export async function fetchAIStream(options = {}, externalController) {
   }
   // 自动带上token（如有）
   try {
-    const info = localStorage.getItem('token') || '';  
+    const info = localStorage.getItem('boardToken') || '';  
     if (info) {
       headers["Authorization"] = `Bearer ${info}`;
     }

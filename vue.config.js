@@ -9,14 +9,14 @@ module.exports = defineConfig({
   devServer: {
     port: 8080,
     open: true,
-    // proxy: {
-    //   "/api": {
-    //     target: "https://gtgb.gtshebei.com/",
-    //     ws: true,
-    //     changeOrigin: true,
-    //     pathRewrite: { "^/api": "" }
-    //   }
-    // }
+    proxy: {
+      "/api": {
+        target: "http://192.168.10.165:5000/",
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: { "^/api": "" }
+      }
+    }
   },
   chainWebpack: config => {
     // 覆盖 images 规则

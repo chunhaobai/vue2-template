@@ -1,18 +1,20 @@
 import axios from 'axios';
-import { Message, Loading } from 'element-ui';
-import config from '@/config'
+import { Message, Loading , MessageBox  } from 'element-ui';
+import config from '../config'
 
 let loadingInstance = null;
 
 // 创建 axios 实例
+console.log(config.API_BASE_URL,'config.API_BASE_URL');
+
 const service = axios.create({
-  baseURL: config.API_BASE_URL || '/api',
-  timeout: 10000
+  baseURL: config.API_BASE_URL||'/api',
+  timeout: 60 * 1000
 });
 // 请求拦截器
 service.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token') || '';
+    const token = localStorage.getItem('boardToken') || '';
 
     // 特定接口不显示 loading
     if (!config.disableGlobalLoading) {
@@ -33,14 +35,24 @@ service.interceptors.request.use(
     if (
         token
       ) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+        config.headers['Authorization'] = `${token}`;
       }
     return config;
   },
   error => {
     loadingInstance && loadingInstance.close();
-    Message.error('请求失败');
-    return Promise.reject(error);
+
+    const showError = Throttle((error) => {
+      MessageBox.alert(error.message || '请求失败，-1', "提示", {
+        confirmButtonText: "确定",
+        type: "warning",
+        showClose: false
+      });
+    }, 2000);
+    
+    // 调用
+    showError(error);
+    return error;
   }
 );
 
@@ -54,34 +66,80 @@ service.interceptors.response.use(
     // 1. 如果是对象且带状态标识
     if (
       typeof res === 'object' &&
-      (res.coSde == 200 ||
-        res.Code == 1 ||
-        res.status == 200 ||
-        res.statusCode == '200' ||
-        res.ErrorCode == '-100')
-    ) {
+      (
+        res.status == 200
+    )) {
       return res.data ?? res;
     }
 
-    // 2. 如果是对象但无状态标识（直接返回）
-    if (typeof res === 'object' && !('code' in res) && !('status' in res)) {
-      return res;
-    }
+    // 2. 特定对象（直接返回）
+    // if (response.config.url.indexOf("") > -1)) {
+    //   return response;
+    // }
 
-    // 3. 如果直接返回数组、字符串、数字
-    if (Array.isArray(res) || typeof res === 'string' || typeof res === 'number') {
-      return res;
-    }
-
-    // 4. 其他情况视为错误
-    Message.error(res.message || res.msg || res || '请求失败');
-    return Promise.reject(new Error(res.message || res.msg || res.Msg || res || '请求失败'));
+    return res;
   },
   error => {
     loadingInstance && loadingInstance.close();
-    // console.log(error,'err!!');
-    if(error.message == 'Network Error'){
-      Message.error('网络错误，-1');
+    if (
+      // 网络错误
+      error.message.indexOf("code 500") !== -1 ||
+      error.message.indexOf("code 502") !== -1 ||
+      error.message.indexOf("code 503") !== -1 ||
+      error.message.indexOf("code 504") !== -1
+    ) {
+      const showError = Throttle((error) => {
+        MessageBox.alert('网络错误，-1', "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
+    }
+    else if (
+      // 网络错误
+      error.message.indexOf("code 401") !== -1
+    ) {
+      const showError = Throttle((error) => {
+        MessageBox.alert('身份验证失效，请重新获取页面，-1', "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
+    }else if (
+      // 网络错误
+      error.message.indexOf("code 403") !== -1
+    ) {
+      const showError = Throttle((error) => {
+        MessageBox.alert(error.message, "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
+    }else if (error.message == 'Network Error'){
+      const showError = Throttle((error) => {
+        MessageBox.alert('网络错误，-1', "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
+    }
+    else{
+      const showError = Throttle((error) => {
+        MessageBox.alert(error.message || '请求失败，请联系管理员处理，-2', "提示", {
+          confirmButtonText: "确定",
+          type: "warning",
+          showClose: false
+        });
+      }, 2000);
+      showError(error);
     }
     return error;
   }
@@ -99,7 +157,7 @@ export function requestWithCustomURL(
   // }
 
   // 动态设置 token
-  const token = config.customToken || localStorage.getItem('token') || '';
+  const token = config.customToken || localStorage.getItem('boardToken') || '';
   if (token) {
     if (config.tokenType === 'Bearer') {
       config.headers = {
@@ -121,5 +179,19 @@ export function requestWithCustomURL(
 
   return service(config);
 }
+
+
+function Throttle(func, delay = 2000) {
+  let canRun = true; // 每个函数独立状态
+  return function(...args) {
+    if (!canRun) return;
+    canRun = false;
+    func.apply(this, args);
+    setTimeout(() => {
+      canRun = true;
+    }, delay);
+  };
+}
+
 
 export default service;
