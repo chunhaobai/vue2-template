@@ -10,8 +10,17 @@
 
 ## 使用方式
 ```bash
+# 1. 克隆模板项目
 git clone  git@github.com:chunhaobai/vue2-template.git my-new-project
 cd my-new-project
+# 2. 删除原有的 Git 绑定
+rm -rf .git
+# 3. 重新初始化为一个新的 Git 仓库
+git init
+git add .
+git commit -m "init from vue2-template"
+
+# 4. 运行项目
 npm install
 npm run serve
 npm run build
